@@ -1,3 +1,63 @@
 <resources>
     <string name="app_name">FriLuft</string>
+
+    <!-- Navigation / common -->
+    <string name="back">Back</string>
+    <string name="change_language">Change language</string>
+
+    <!-- Home screen -->
+    <string name="search_city">Search city</string>
+    <string name="feels_like">Feels like %1$s°</string>
+    <string name="forecast_button">View 7-day forecast</string>
+    <string name="location_required_title">Location permission required</string>
+    <string name="location_required_body">FriLuft needs your location to show weather.</string>
+    <string name="allow_location">Allow location</string>
+    <string name="location_unknown">Your location</string>
+    <string name="location_error">Could not get location</string>
+
+    <!-- Weather details -->
+    <string name="wind">Wind</string>
+    <string name="precipitation">Precipitation</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind_value">%1$s m/s</string>
+    <string name="precip_value">%1$s mm/h</string>
+    <string name="humidity_value">%1$s%%</string>
+
+    <!-- Forecast screen -->
+    <string name="forecast_title">7-day forecast</string>
+    <string name="hourly_title">Hourly forecast today</string>
+    <string name="weekly_title">Weekly overview</string>
+
+    <!-- Search screen -->
+    <string name="search_title">Search city</string>
+    <string name="search_placeholder">Search Swedish cities…</string>
+
+    <!-- Outdoor score labels -->
+    <string name="score_good_label">Perfect outdoors</string>
+    <string name="score_okay_label">Manageable</string>
+    <string name="score_stay_inside_label">Stay inside</string>
+    <string name="score_good_reason">Great weather for outdoor activities</string>
+    <string name="score_heavy_rain">Heavy rain (%1$s mm/h)</string>
+    <string name="score_strong_wind">Strong wind (%1$s m/s)</string>
+    <string name="score_extreme_cold">Extreme cold (%1$s°C)</string>
+    <string name="score_light_rain">Light rain (%1$s mm/h)</string>
+    <string name="score_windy">Windy (%1$s m/s)</string>
+    <string name="score_cold">Cold (%1$s°C) — dress warmly</string>
+    <string name="score_hot">Hot (%1$s°C) — take it easy</string>
+
+    <!-- Weather symbol labels -->
+    <string name="symbol_clear">Clear</string>
+    <string name="symbol_nearly_clear">Nearly clear</string>
+    <string name="symbol_half_cloudy">Partly cloudy</string>
+    <string name="symbol_cloudy">Cloudy</string>
+    <string name="symbol_fog">Fog</string>
+    <string name="symbol_rain_showers">Rain showers</string>
+    <string name="symbol_thunder">Thunderstorm</string>
+    <string name="symbol_sleet_showers">Sleet showers</string>
+    <string name="symbol_snow_showers">Snow showers</string>
+    <string name="symbol_rain">Rain</string>
+    <string name="symbol_thunder_rain">Thunder with rain</string>
+    <string name="symbol_sleet">Sleet</string>
+    <string name="symbol_snow">Snowfall</string>
+    <string name="symbol_unknown">Unknown</string>
 </resources>

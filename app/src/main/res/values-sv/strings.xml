@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">FriLuft</string>
+
+    <!-- Navigation / common -->
+    <string name="back">Tillbaka</string>
+    <string name="change_language">Byt språk</string>
+
+    <!-- Home screen -->
+    <string name="search_city">Sök stad</string>
+    <string name="feels_like">Känns som %1$s°</string>
+    <string name="forecast_button">Visa 7-dagarsprognos</string>
+    <string name="location_required_title">Platsbehörighet krävs</string>
+    <string name="location_required_body">FriLuft behöver din plats för att visa väder.</string>
+    <string name="allow_location">Tillåt plats</string>
+    <string name="location_unknown">Din plats</string>
+    <string name="location_error">Kunde inte hämta plats</string>
+
+    <!-- Weather details -->
+    <string name="wind">Vind</string>
+    <string name="precipitation">Nederbörd</string>
+    <string name="humidity">Luftfuktighet</string>
+    <string name="wind_value">%1$s m/s</string>
+    <string name="precip_value">%1$s mm/h</string>
+    <string name="humidity_value">%1$s%%</string>
+
+    <!-- Forecast screen -->
+    <string name="forecast_title">7-dagarsprognos</string>
+    <string name="hourly_title">Timprognos idag</string>
+    <string name="weekly_title">Veckoöversikt</string>
+
+    <!-- Search screen -->
+    <string name="search_title">Sök stad</string>
+    <string name="search_placeholder">Sök bland svenska städer…</string>
+
+    <!-- Outdoor score labels -->
+    <string name="score_good_label">Perfekt utomhus</string>
+    <string name="score_okay_label">Går bra</string>
+    <string name="score_stay_inside_label">Stanna inne</string>
+    <string name="score_good_reason">Bra väder för friluftsliv</string>
+    <string name="score_heavy_rain">Kraftigt regn (%1$s mm/h)</string>
+    <string name="score_strong_wind">Hård vind (%1$s m/s)</string>
+    <string name="score_extreme_cold">Extrem kyla (%1$s°C)</string>
+    <string name="score_light_rain">Lite regn (%1$s mm/h)</string>
+    <string name="score_windy">Blåsigt (%1$s m/s)</string>
+    <string name="score_cold">Kallt (%1$s°C) — klä på dig</string>
+    <string name="score_hot">Varmt (%1$s°C) — ta det lugnt</string>
+
+    <!-- Weather symbol labels -->
+    <string name="symbol_clear">Klart</string>
+    <string name="symbol_nearly_clear">Nästan klart</string>
+    <string name="symbol_half_cloudy">Halvklart</string>
+    <string name="symbol_cloudy">Molnigt</string>
+    <string name="symbol_fog">Dimma</string>
+    <string name="symbol_rain_showers">Regnskurar</string>
+    <string name="symbol_thunder">Åskväder</string>
+    <string name="symbol_sleet_showers">Snöblandad regn</string>
+    <string name="symbol_snow_showers">Snöbyar</string>
+    <string name="symbol_rain">Regn</string>
+    <string name="symbol_thunder_rain">Åska med regn</string>
+    <string name="symbol_sleet">Snöblandat regn</string>
+    <string name="symbol_snow">Snöfall</string>
+    <string name="symbol_unknown">Okänt</string>
+</resources>

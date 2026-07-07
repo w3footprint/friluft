@@ -37,15 +37,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import se.w3footprint.friluft.R
 import se.w3footprint.friluft.domain.model.DailyForecast
 import se.w3footprint.friluft.domain.model.HourlyForecast
+import se.w3footprint.friluft.presentation.home.weatherSymbolLabel
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private val dayFormatter = DateTimeFormatter.ofPattern("EEE d MMM", Locale("sv", "SE"))
 private val hourFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,14 +57,15 @@ fun ForecastScreen(
     viewModel: ForecastViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val dayFormatter = DateTimeFormatter.ofPattern("EEE d MMM", Locale.getDefault())
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("7-dagarsprognos") },
+                title = { Text(stringResource(R.string.forecast_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Tillbaka")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
@@ -77,14 +80,14 @@ fun ForecastScreen(
                     modifier = Modifier.align(Alignment.Center).padding(24.dp),
                     color = MaterialTheme.colorScheme.error,
                 )
-                else -> ForecastContent(uiState = uiState)
+                else -> ForecastContent(uiState = uiState, dayFormatter = dayFormatter)
             }
         }
     }
 }
 
 @Composable
-private fun ForecastContent(uiState: ForecastUiState) {
+private fun ForecastContent(uiState: ForecastUiState, dayFormatter: DateTimeFormatter) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -92,7 +95,7 @@ private fun ForecastContent(uiState: ForecastUiState) {
         if (uiState.hourly.isNotEmpty()) {
             item {
                 Spacer(Modifier.height(8.dp))
-                Text("Timprognos idag", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.hourly_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(8.dp))
                 HourlyChart(hourly = uiState.hourly)
             }
@@ -100,10 +103,10 @@ private fun ForecastContent(uiState: ForecastUiState) {
         if (uiState.daily.isNotEmpty()) {
             item {
                 Spacer(Modifier.height(8.dp))
-                Text("Veckoöversikt", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.weekly_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(4.dp))
             }
-            items(uiState.daily) { day -> DailyForecastRow(day = day) }
+            items(uiState.daily) { day -> DailyForecastRow(day = day, dayFormatter = dayFormatter) }
         }
         item { Spacer(Modifier.height(16.dp)) }
     }
@@ -151,7 +154,7 @@ private fun HourlyChart(hourly: List<HourlyForecast>) {
 }
 
 @Composable
-private fun DailyForecastRow(day: DailyForecast) {
+private fun DailyForecastRow(day: DailyForecast, dayFormatter: DateTimeFormatter) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -168,13 +171,4 @@ private fun DailyForecastRow(day: DailyForecast) {
             Text("${day.tempMin.toInt()}° / ${day.tempMax.toInt()}°", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
         }
     }
-}
-
-private fun weatherSymbolLabel(symbol: Int): String = when (symbol) {
-    1 -> "Klart"; 2 -> "Nästan klart"; 3, 4 -> "Halvklart"; 5, 6 -> "Molnigt"
-    7 -> "Dimma"; 8, 9, 10 -> "Regnskurar"; 11 -> "Åskväder"
-    12, 13, 14 -> "Snöblandad regn"; 15, 16, 17 -> "Snöbyar"
-    18, 19, 20 -> "Regn"; 21 -> "Åska med regn"
-    22, 23, 24 -> "Snöblandat regn"; 25, 26, 27 -> "Snöfall"
-    else -> "Okänt"
 }

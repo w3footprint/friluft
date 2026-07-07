@@ -3,6 +3,7 @@ package se.w3footprint.friluft.presentation.home
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Air
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.WaterDrop
@@ -35,7 +37,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,10 +44,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import se.w3footprint.friluft.R
 import se.w3footprint.friluft.domain.model.CurrentWeather
 import se.w3footprint.friluft.domain.model.OutdoorScore
 import se.w3footprint.friluft.presentation.common.theme.GrassGreen
@@ -71,7 +75,7 @@ fun HomeScreen(
         else viewModel.onLocationPermissionDenied()
     }
 
-    LaunchedEffect(Unit) {
+    androidx.compose.runtime.LaunchedEffect(Unit) {
         locationPermissionLauncher.launch(
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         )
@@ -84,15 +88,18 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(18.dp))
                         Text(
-                            text = uiState.cityName.ifEmpty { "FriLuft" },
+                            text = uiState.cityName.ifEmpty { stringResource(R.string.app_name) },
                             modifier = Modifier.padding(start = 4.dp),
                             style = MaterialTheme.typography.titleLarge,
                         )
                     }
                 },
                 actions = {
+                    IconButton(onClick = { toggleLanguage() }) {
+                        Icon(Icons.Default.Language, contentDescription = stringResource(R.string.change_language))
+                    }
                     IconButton(onClick = onNavigateToSearch) {
-                        Icon(Icons.Default.Search, contentDescription = "Sök stad")
+                        Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_city))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
@@ -125,6 +132,13 @@ fun HomeScreen(
     }
 }
 
+private fun toggleLanguage() {
+    val current = AppCompatDelegate.getApplicationLocales()
+    val currentTag = if (current.isEmpty) java.util.Locale.getDefault().language else current[0]?.language
+    val next = if (currentTag == "sv") "en" else "sv"
+    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(next))
+}
+
 @Composable
 private fun HomeContent(weather: CurrentWeather, score: OutdoorScore?, onViewForecast: () -> Unit) {
     Column(
@@ -138,7 +152,7 @@ private fun HomeContent(weather: CurrentWeather, score: OutdoorScore?, onViewFor
         score?.let { OutdoorScoreCard(score = it) }
         WeatherDetailsCard(weather = weather)
         Button(onClick = onViewForecast, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
-            Text("Visa 7-dagarsprognos")
+            Text(stringResource(R.string.forecast_button))
         }
         Spacer(Modifier.height(16.dp))
     }
@@ -160,8 +174,17 @@ private fun TemperatureHero(weather: CurrentWeather) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "${weather.temperature.toInt()}°", fontSize = 80.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(text = "Känns som ${weather.feelsLike.toInt()}°", style = MaterialTheme.typography.bodyLarge, color = Color.White.copy(alpha = 0.85f))
-            Text(text = weatherSymbolLabel(weather.weatherSymbol), style = MaterialTheme.typography.titleMedium, color = Color.White.copy(alpha = 0.9f), modifier = Modifier.padding(top = 4.dp))
+            Text(
+                text = stringResource(R.string.feels_like, weather.feelsLike.toInt().toString()),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.85f),
+            )
+            Text(
+                text = weatherSymbolLabel(weather.weatherSymbol),
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White.copy(alpha = 0.9f),
+                modifier = Modifier.padding(top = 4.dp),
+            )
         }
     }
 }
@@ -190,9 +213,21 @@ private fun WeatherDetailsCard(weather: CurrentWeather) {
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-            DetailItem(icon = Icons.Default.Air, label = "Vind", value = "${weather.windSpeed.toInt()} m/s")
-            DetailItem(icon = Icons.Default.WaterDrop, label = "Nederbörd", value = "${weather.precipitation} mm/h")
-            DetailItem(icon = Icons.Default.WaterDrop, label = "Luftfuktighet", value = "${weather.humidity}%")
+            DetailItem(
+                icon = Icons.Default.Air,
+                label = stringResource(R.string.wind),
+                value = stringResource(R.string.wind_value, weather.windSpeed.toInt().toString()),
+            )
+            DetailItem(
+                icon = Icons.Default.WaterDrop,
+                label = stringResource(R.string.precipitation),
+                value = stringResource(R.string.precip_value, weather.precipitation.toString()),
+            )
+            DetailItem(
+                icon = Icons.Default.WaterDrop,
+                label = stringResource(R.string.humidity),
+                value = stringResource(R.string.humidity_value, weather.humidity.toString()),
+            )
         }
     }
 }
@@ -210,17 +245,26 @@ private fun DetailItem(icon: ImageVector, label: String, value: String) {
 private fun LocationPermissionPrompt(modifier: Modifier = Modifier, onRetry: () -> Unit) {
     Column(modifier = modifier.padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary)
-        Text("Platsbehörighet krävs", style = MaterialTheme.typography.titleLarge)
-        Text("FriLuft behöver din plats för att visa väder.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f))
-        Button(onClick = onRetry) { Text("Tillåt plats") }
+        Text(stringResource(R.string.location_required_title), style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.location_required_body), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f))
+        Button(onClick = onRetry) { Text(stringResource(R.string.allow_location)) }
     }
 }
 
-private fun weatherSymbolLabel(symbol: Int): String = when (symbol) {
-    1 -> "Klart"; 2 -> "Nästan klart"; 3, 4 -> "Halvklart"; 5, 6 -> "Molnigt"
-    7 -> "Dimma"; 8, 9, 10 -> "Regnskurar"; 11 -> "Åskväder"
-    12, 13, 14 -> "Snöblandad regn"; 15, 16, 17 -> "Snöbyar"
-    18, 19, 20 -> "Regn"; 21 -> "Åska med regn"
-    22, 23, 24 -> "Snöblandat regn"; 25, 26, 27 -> "Snöfall"
-    else -> "Okänt"
+@Composable
+fun weatherSymbolLabel(symbol: Int): String = when (symbol) {
+    1 -> stringResource(R.string.symbol_clear)
+    2 -> stringResource(R.string.symbol_nearly_clear)
+    3, 4 -> stringResource(R.string.symbol_half_cloudy)
+    5, 6 -> stringResource(R.string.symbol_cloudy)
+    7 -> stringResource(R.string.symbol_fog)
+    8, 9, 10 -> stringResource(R.string.symbol_rain_showers)
+    11 -> stringResource(R.string.symbol_thunder)
+    12, 13, 14 -> stringResource(R.string.symbol_sleet_showers)
+    15, 16, 17 -> stringResource(R.string.symbol_snow_showers)
+    18, 19, 20 -> stringResource(R.string.symbol_rain)
+    21 -> stringResource(R.string.symbol_thunder_rain)
+    22, 23, 24 -> stringResource(R.string.symbol_sleet)
+    25, 26, 27 -> stringResource(R.string.symbol_snow)
+    else -> stringResource(R.string.symbol_unknown)
 }

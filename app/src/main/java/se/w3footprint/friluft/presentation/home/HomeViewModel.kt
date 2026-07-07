@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import se.w3footprint.friluft.R
 import se.w3footprint.friluft.data.local.store.CityPreferencesStore
 import se.w3footprint.friluft.domain.usecase.score.GetOutdoorScoreUseCase
 import se.w3footprint.friluft.domain.usecase.weather.GetCurrentWeatherUseCase
@@ -81,7 +82,7 @@ class HomeViewModel @Inject constructor(
                 ).await()
 
                 if (location == null) {
-                    _uiState.update { it.copy(isLoading = false, error = "Kunde inte hämta plats") }
+                    _uiState.update { it.copy(isLoading = false, error = context.getString(R.string.location_error)) }
                     return@launch
                 }
 
@@ -94,10 +95,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun resolveCityName(lat: Double, lon: Double): String = try {
-        val geocoder = Geocoder(context, Locale("sv", "SE"))
+        val geocoder = Geocoder(context, Locale.getDefault())
         @Suppress("DEPRECATION")
-        geocoder.getFromLocation(lat, lon, 1)?.firstOrNull()?.locality ?: "Din plats"
+        geocoder.getFromLocation(lat, lon, 1)?.firstOrNull()?.locality
+            ?: context.getString(R.string.location_unknown)
     } catch (e: Exception) {
-        "Din plats"
+        context.getString(R.string.location_unknown)
     }
 }
