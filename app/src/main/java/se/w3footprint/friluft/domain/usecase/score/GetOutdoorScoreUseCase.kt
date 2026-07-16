@@ -7,6 +7,12 @@ import se.w3footprint.friluft.domain.model.CurrentWeather
 import se.w3footprint.friluft.domain.model.OutdoorScore
 import javax.inject.Inject
 
+fun outdoorRating(temp: Double, wind: Double, precip: Double): OutdoorScore.Rating = when {
+    precip >= 2.0 || wind >= 10.0 || temp < -10.0 -> OutdoorScore.Rating.STAY_INSIDE
+    precip >= 0.5 || wind >= 7.0 || temp < -5.0 || temp > 32.0 -> OutdoorScore.Rating.OKAY
+    else -> OutdoorScore.Rating.GOOD
+}
+
 class GetOutdoorScoreUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
@@ -16,33 +22,30 @@ class GetOutdoorScoreUseCase @Inject constructor(
         val wind = weather.windSpeed
         val precip = weather.precipitation
 
-        return when {
-            precip >= 2.0 -> OutdoorScore(
+        return when (outdoorRating(temp, wind, precip)) {
+            OutdoorScore.Rating.STAY_INSIDE -> OutdoorScore(
                 OutdoorScore.Rating.STAY_INSIDE,
                 context.getString(R.string.score_stay_inside_label),
-                context.getString(R.string.score_heavy_rain, precip.toInt().toString()),
+                buildStayInsideReason(temp, wind, precip),
             )
-            wind >= 10.0 -> OutdoorScore(
-                OutdoorScore.Rating.STAY_INSIDE,
-                context.getString(R.string.score_stay_inside_label),
-                context.getString(R.string.score_strong_wind, wind.toInt().toString()),
-            )
-            temp < -10.0 -> OutdoorScore(
-                OutdoorScore.Rating.STAY_INSIDE,
-                context.getString(R.string.score_stay_inside_label),
-                context.getString(R.string.score_extreme_cold, temp.toInt().toString()),
-            )
-            precip in 0.5..1.9 || wind in 7.0..9.9 || temp < -5.0 || temp > 32.0 -> OutdoorScore(
+            OutdoorScore.Rating.OKAY -> OutdoorScore(
                 OutdoorScore.Rating.OKAY,
                 context.getString(R.string.score_okay_label),
                 buildOkayReason(temp, wind, precip),
             )
-            else -> OutdoorScore(
+            OutdoorScore.Rating.GOOD -> OutdoorScore(
                 OutdoorScore.Rating.GOOD,
                 context.getString(R.string.score_good_label),
                 context.getString(R.string.score_good_reason),
             )
         }
+    }
+
+    private fun buildStayInsideReason(temp: Double, wind: Double, precip: Double): String = when {
+        precip >= 2.0 -> context.getString(R.string.score_heavy_rain, precip.toInt().toString())
+        wind >= 10.0 -> context.getString(R.string.score_strong_wind, wind.toInt().toString())
+        temp < -10.0 -> context.getString(R.string.score_extreme_cold, temp.toInt().toString())
+        else -> context.getString(R.string.score_good_reason)
     }
 
     private fun buildOkayReason(temp: Double, wind: Double, precip: Double): String = when {
