@@ -71,3 +71,6 @@ proguard/
 
 # Kotlin
 *.kotlin_module
+
+# Android Studio — ignore entire .idea folder
+.idea/
