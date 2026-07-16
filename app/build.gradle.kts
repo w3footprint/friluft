@@ -9,6 +9,7 @@ plugins {
 android {
     namespace = "se.w3footprint.friluft"
     compileSdk = 35
+    buildToolsVersion = "35.0.0"
 
     defaultConfig {
         applicationId = "se.w3footprint.friluft"
@@ -50,6 +51,14 @@ android {
         compose = true
         buildConfig = true
     }
+}
+
+ksp {
+    arg("hilt.correctErrorTypes", "true")
+}
+
+hilt {
+    enableAggregatingTask = true
 }
 
 dependencies {
