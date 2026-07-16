@@ -7,9 +7,9 @@ A clean Android weather app built for the Swedish market. FriLuft tells you not 
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="160" alt="Home" />
-  <img src="docs/screenshots/forecast.png" width="160" alt="7-day forecast" />
-  <img src="docs/screenshots/search.png" width="160" alt="City search" />
+  <img src="docs/screenshots/home.jpg" width="160" alt="Home" />
+  <img src="docs/screenshots/forecast.jpg" width="160" alt="7-day forecast" />
+  <img src="docs/screenshots/search.jpg" width="160" alt="City search" />
 </p>
 
 ## What it does
