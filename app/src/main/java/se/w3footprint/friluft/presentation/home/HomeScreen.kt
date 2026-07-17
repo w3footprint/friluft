@@ -265,10 +265,37 @@ private fun OutdoorScoreCard(score: OutdoorScore) {
         OutdoorScore.Rating.OKAY -> SunYellow to Color.Black
         OutdoorScore.Rating.STAY_INSIDE -> StormRed to Color.White
     }
+    val label = when (score.rating) {
+        OutdoorScore.Rating.GOOD -> stringResource(R.string.score_good_label)
+        OutdoorScore.Rating.OKAY -> stringResource(R.string.score_okay_label)
+        OutdoorScore.Rating.STAY_INSIDE -> stringResource(R.string.score_stay_inside_label)
+    }
+    val reason = outdoorReasonString(score)
     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text(text = score.label, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = contentColor)
-            Text(text = score.reason, style = MaterialTheme.typography.bodyMedium, color = contentColor.copy(alpha = 0.85f), modifier = Modifier.padding(top = 4.dp))
+            Text(text = label, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = contentColor)
+            Text(text = reason, style = MaterialTheme.typography.bodyMedium, color = contentColor.copy(alpha = 0.85f), modifier = Modifier.padding(top = 4.dp))
+        }
+    }
+}
+
+@Composable
+private fun outdoorReasonString(score: OutdoorScore): String {
+    val t = score.temp.toInt().toString()
+    val w = score.wind.toInt().toString()
+    val p = score.precip.toString()
+    return when (score.rating) {
+        OutdoorScore.Rating.GOOD -> stringResource(R.string.score_good_reason)
+        OutdoorScore.Rating.STAY_INSIDE -> when {
+            score.precip >= 2.0 -> stringResource(R.string.score_heavy_rain, p)
+            score.wind >= 10.0 -> stringResource(R.string.score_strong_wind, w)
+            else -> stringResource(R.string.score_extreme_cold, t)
+        }
+        OutdoorScore.Rating.OKAY -> when {
+            score.precip >= 0.5 -> stringResource(R.string.score_light_rain, p)
+            score.wind >= 7.0 -> stringResource(R.string.score_windy, w)
+            score.temp < -5.0 -> stringResource(R.string.score_cold, t)
+            else -> stringResource(R.string.score_hot, t)
         }
     }
 }

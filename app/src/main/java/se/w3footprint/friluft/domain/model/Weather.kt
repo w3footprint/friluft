@@ -33,8 +33,9 @@ data class DailyForecast(
 
 data class OutdoorScore(
     val rating: Rating,
-    val label: String,
-    val reason: String,
+    val temp: Double,
+    val wind: Double,
+    val precip: Double,
 ) {
     enum class Rating { GOOD, OKAY, STAY_INSIDE }
 }
