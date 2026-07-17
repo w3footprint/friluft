@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.SignalWifiOff
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -75,6 +78,10 @@ fun ForecastScreen(
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when {
                 uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                uiState.isOffline && uiState.hourly.isEmpty() && uiState.daily.isEmpty() -> ForecastOfflineScreen(
+                    modifier = Modifier.align(Alignment.Center),
+                    onRetry = { viewModel.reload() },
+                )
                 uiState.error != null -> Text(
                     text = uiState.error ?: "",
                     modifier = Modifier.align(Alignment.Center).padding(24.dp),
@@ -82,6 +89,35 @@ fun ForecastScreen(
                 )
                 else -> ForecastContent(uiState = uiState, dayFormatter = dayFormatter)
             }
+        }
+    }
+}
+
+@Composable
+private fun ForecastOfflineScreen(modifier: Modifier = Modifier, onRetry: () -> Unit) {
+    Column(
+        modifier = modifier.padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Default.SignalWifiOff,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+        )
+        Text(
+            text = stringResource(R.string.offline_no_cache_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = stringResource(R.string.offline_no_cache_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        )
+        Button(onClick = onRetry, shape = RoundedCornerShape(12.dp)) {
+            Text(stringResource(R.string.retry))
         }
     }
 }

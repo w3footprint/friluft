@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import se.w3footprint.friluft.domain.model.WeatherResult
 import se.w3footprint.friluft.domain.usecase.weather.GetDailyForecastUseCase
 import se.w3footprint.friluft.domain.usecase.weather.GetHourlyForecastUseCase
 import javax.inject.Inject
@@ -35,25 +36,31 @@ class ForecastViewModel @Inject constructor(
 
     fun loadForecastForCity(lat: Double, lon: Double) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null, isOffline = false) }
             launch {
                 getDailyForecast(lat, lon).collect { result ->
-                    result.fold(
-                        onSuccess = { daily -> _uiState.update { it.copy(daily = daily) } },
-                        onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
-                    )
+                    when (result) {
+                        is WeatherResult.Fresh -> _uiState.update { it.copy(daily = result.data) }
+                        is WeatherResult.Offline -> _uiState.update { it.copy(isOffline = true) }
+                        is WeatherResult.Error -> _uiState.update { it.copy(error = result.message) }
+                        else -> Unit
+                    }
                 }
             }
             launch {
                 getHourlyForecast(lat, lon).collect { result ->
-                    result.fold(
-                        onSuccess = { hourly -> _uiState.update { it.copy(hourly = hourly, isLoading = false) } },
-                        onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } },
-                    )
+                    when (result) {
+                        is WeatherResult.Fresh -> _uiState.update { it.copy(hourly = result.data, isLoading = false) }
+                        is WeatherResult.Offline -> _uiState.update { it.copy(isLoading = false, isOffline = true) }
+                        is WeatherResult.Error -> _uiState.update { it.copy(isLoading = false, error = result.message) }
+                        else -> Unit
+                    }
                 }
             }
         }
     }
+
+    fun reload() = loadForecast()
 
     @SuppressLint("MissingPermission")
     private fun loadForecast() {
