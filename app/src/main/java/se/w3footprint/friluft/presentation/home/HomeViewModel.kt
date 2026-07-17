@@ -35,6 +35,11 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    var lastLat: Double? = null
+        private set
+    var lastLon: Double? = null
+        private set
+
     init {
         observeSavedCity()
     }
@@ -47,13 +52,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onLocationPermissionGranted() = fetchWeatherForCurrentLocation()
+    fun onLocationPermissionGranted() {
+        if (_uiState.value.weather != null) return
+        fetchWeatherForCurrentLocation()
+    }
 
     fun onLocationPermissionDenied() {
         _uiState.update { it.copy(locationPermissionRequired = true) }
     }
 
     fun loadWeatherForCity(lat: Double, lon: Double, cityName: String) {
+        lastLat = lat
+        lastLon = lon
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, isOffline = false, isShowingCachedData = false, cityName = cityName) }
             getCurrentWeather(lat, lon).collect { result ->

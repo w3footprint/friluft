@@ -9,4 +9,6 @@ data class ForecastUiState(
     val hourly: List<HourlyForecast> = emptyList(),
     val error: String? = null,
     val isOffline: Boolean = false,
+    val lastLat: Double? = null,
+    val lastLon: Double? = null,
 )
