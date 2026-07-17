@@ -56,17 +56,11 @@ private val hourFormatter = DateTimeFormatter.ofPattern("HH:mm")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForecastScreen(
-    lat: Double,
-    lon: Double,
     onNavigateBack: () -> Unit,
     viewModel: ForecastViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val dayFormatter = DateTimeFormatter.ofPattern("EEE d MMM", Locale.getDefault())
-
-    androidx.compose.runtime.LaunchedEffect(lat, lon) {
-        viewModel.loadForecastForCity(lat, lon)
-    }
 
     Scaffold(
         topBar = {

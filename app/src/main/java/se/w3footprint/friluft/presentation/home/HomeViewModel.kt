@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import se.w3footprint.friluft.R
 import se.w3footprint.friluft.data.local.store.CityPreferencesStore
+import se.w3footprint.friluft.data.local.store.LastKnownLocation
 import se.w3footprint.friluft.domain.model.WeatherResult
 import se.w3footprint.friluft.domain.usecase.score.GetOutdoorScoreUseCase
 import se.w3footprint.friluft.domain.usecase.weather.GetCurrentWeatherUseCase
@@ -30,15 +31,11 @@ class HomeViewModel @Inject constructor(
     private val getCurrentWeather: GetCurrentWeatherUseCase,
     private val getOutdoorScore: GetOutdoorScoreUseCase,
     private val cityPreferencesStore: CityPreferencesStore,
+    private val lastKnownLocation: LastKnownLocation,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
-
-    var lastLat: Double? = null
-        private set
-    var lastLon: Double? = null
-        private set
 
     init {
         observeSavedCity()
@@ -62,8 +59,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun loadWeatherForCity(lat: Double, lon: Double, cityName: String) {
-        lastLat = lat
-        lastLon = lon
+        lastKnownLocation.lat = lat
+        lastKnownLocation.lon = lon
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, isOffline = false, isShowingCachedData = false, cityName = cityName) }
             getCurrentWeather(lat, lon).collect { result ->
