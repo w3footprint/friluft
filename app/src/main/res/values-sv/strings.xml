@@ -14,6 +14,10 @@
     <string name="allow_location">Tillåt plats</string>
     <string name="location_unknown">Din plats</string>
     <string name="location_error">Kunde inte hämta plats</string>
+    <string name="offline_banner">Ingen internet — visar senast kända data</string>
+    <string name="offline_no_cache_title">Ingen internetanslutning</string>
+    <string name="offline_no_cache_body">Anslut till internet för att se det senaste vädret för din plats.</string>
+    <string name="retry">Försök igen</string>
 
     <!-- Weather details -->
     <string name="wind">Vind</string>

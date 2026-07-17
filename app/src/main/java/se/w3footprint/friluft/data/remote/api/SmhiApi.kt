@@ -6,9 +6,9 @@ import se.w3footprint.friluft.data.remote.dto.SmhiResponseDto
 
 interface SmhiApi {
 
-    @GET("api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json")
+    @GET("api/category/snow1g/version/1/geotype/point/lon/{lon}/lat/{lat}/data.json")
     suspend fun getForecast(
-        @Path("lon") lon: Double,
-        @Path("lat") lat: Double,
+        @Path("lon") lon: String,
+        @Path("lat") lat: String,
     ): SmhiResponseDto
 }

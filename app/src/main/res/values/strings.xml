@@ -14,6 +14,10 @@
     <string name="allow_location">Allow location</string>
     <string name="location_unknown">Your location</string>
     <string name="location_error">Could not get location</string>
+    <string name="offline_banner">No internet — showing last known data</string>
+    <string name="offline_no_cache_title">No internet connection</string>
+    <string name="offline_no_cache_body">Connect to the internet to see the latest weather for your location.</string>
+    <string name="retry">Try again</string>
 
     <!-- Weather details -->
     <string name="wind">Wind</string>

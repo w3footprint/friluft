@@ -5,23 +5,22 @@ import se.w3footprint.friluft.domain.model.DailyForecast
 import se.w3footprint.friluft.domain.model.HourlyForecast
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.math.exp
 import kotlin.math.pow
 
 private val formatter = DateTimeFormatter.ISO_DATE_TIME
 
-private fun TimeSeriesDto.param(name: String): Double =
-    parameters.firstOrNull { it.name == name }?.values?.firstOrNull() ?: 0.0
-
 fun SmhiResponseDto.toCurrentWeather(): CurrentWeather {
     val now = timeSeries.first()
-    val temp = now.param("t")
-    val wind = now.param("ws")
-    val precip = now.param("pmean")
-    val humidity = now.param("r").toInt()
-    val symbol = now.param("Wsymb2").toInt()
-    val visibility = now.param("vis")
-    val windDir = now.param("wd")
+    val data = now.data
+    val temp = data.airTemperature
+    val wind = data.windSpeed
+    val precip = data.precipitationAmount
+    val humidity = data.humidity.toInt()
+    val symbol = data.symbolCode
+    val visibility = data.visibility
+    val windDir = data.windDirection
 
     return CurrentWeather(
         temperature = temp,
@@ -32,32 +31,32 @@ fun SmhiResponseDto.toCurrentWeather(): CurrentWeather {
         humidity = humidity,
         weatherSymbol = symbol,
         visibility = visibility,
-        updatedAt = ZonedDateTime.parse(approvedTime, formatter),
+        updatedAt = ZonedDateTime.parse(createdTime, formatter),
     )
 }
 
 fun SmhiResponseDto.toHourlyForecast(): List<HourlyForecast> =
     timeSeries.take(24).map { ts ->
         HourlyForecast(
-            time = ZonedDateTime.parse(ts.validTime, formatter),
-            temperature = ts.param("t"),
-            precipitation = ts.param("pmean"),
-            windSpeed = ts.param("ws"),
-            weatherSymbol = ts.param("Wsymb2").toInt(),
+            time = ZonedDateTime.parse(ts.time, formatter),
+            temperature = ts.data.airTemperature,
+            precipitation = ts.data.precipitationAmount,
+            windSpeed = ts.data.windSpeed,
+            weatherSymbol = ts.data.symbolCode,
         )
     }
 
 fun SmhiResponseDto.toDailyForecast(): List<DailyForecast> {
     val byDay = timeSeries.groupBy {
-        ZonedDateTime.parse(it.validTime, formatter).toLocalDate()
+        ZonedDateTime.parse(it.time, formatter).toLocalDate()
     }
     return byDay.entries.take(7).map { (_, entries) ->
-        val temps = entries.map { it.param("t") }
-        val winds = entries.map { it.param("ws") }
-        val precips = entries.map { it.param("pmean") }
-        val symbols = entries.map { it.param("Wsymb2").toInt() }
+        val temps = entries.map { it.data.airTemperature }
+        val winds = entries.map { it.data.windSpeed }
+        val precips = entries.map { it.data.precipitationAmount }
+        val symbols = entries.map { it.data.symbolCode }
         DailyForecast(
-            date = ZonedDateTime.parse(entries.first().validTime, formatter),
+            date = ZonedDateTime.parse(entries.first().time, formatter),
             tempMin = temps.min(),
             tempMax = temps.max(),
             precipitationSum = precips.sum(),

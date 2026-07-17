@@ -23,7 +23,9 @@ import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SignalWifiOff
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -117,6 +119,10 @@ fun HomeScreen(
                         )
                     }
                 )
+                uiState.isOffline && uiState.weather == null -> OfflineEmptyScreen(
+                    modifier = Modifier.align(Alignment.Center),
+                    onRetry = { viewModel.onLocationPermissionGranted() }
+                )
                 uiState.error != null && uiState.weather == null -> Text(
                     text = uiState.error ?: "",
                     modifier = Modifier.align(Alignment.Center).padding(24.dp),
@@ -125,6 +131,7 @@ fun HomeScreen(
                 uiState.weather != null -> HomeContent(
                     weather = uiState.weather!!,
                     score = uiState.outdoorScore,
+                    isShowingCachedData = uiState.isShowingCachedData,
                     onViewForecast = onNavigateToForecast,
                 )
             }
@@ -140,7 +147,12 @@ private fun toggleLanguage() {
 }
 
 @Composable
-private fun HomeContent(weather: CurrentWeather, score: OutdoorScore?, onViewForecast: () -> Unit) {
+private fun HomeContent(
+    weather: CurrentWeather,
+    score: OutdoorScore?,
+    isShowingCachedData: Boolean,
+    onViewForecast: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -148,6 +160,7 @@ private fun HomeContent(weather: CurrentWeather, score: OutdoorScore?, onViewFor
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        if (isShowingCachedData) OfflineBanner()
         TemperatureHero(weather = weather)
         score?.let { OutdoorScoreCard(score = it) }
         WeatherDetailsCard(weather = weather)
@@ -155,6 +168,62 @@ private fun HomeContent(weather: CurrentWeather, score: OutdoorScore?, onViewFor
             Text(stringResource(R.string.forecast_button))
         }
         Spacer(Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun OfflineBanner() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.WifiOff,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = stringResource(R.string.offline_banner),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun OfflineEmptyScreen(modifier: Modifier = Modifier, onRetry: () -> Unit) {
+    Column(
+        modifier = modifier.padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Default.SignalWifiOff,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+        )
+        Text(
+            text = stringResource(R.string.offline_no_cache_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = stringResource(R.string.offline_no_cache_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        )
+        Button(onClick = onRetry, shape = RoundedCornerShape(12.dp)) {
+            Text(stringResource(R.string.retry))
+        }
     }
 }
 

@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import se.w3footprint.friluft.R
 import se.w3footprint.friluft.data.local.store.CityPreferencesStore
+import se.w3footprint.friluft.domain.model.WeatherResult
 import se.w3footprint.friluft.domain.usecase.score.GetOutdoorScoreUseCase
 import se.w3footprint.friluft.domain.usecase.weather.GetCurrentWeatherUseCase
 import java.util.Locale
@@ -54,18 +55,22 @@ class HomeViewModel @Inject constructor(
 
     fun loadWeatherForCity(lat: Double, lon: Double, cityName: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null, cityName = cityName) }
+            _uiState.update { it.copy(isLoading = true, error = null, isOffline = false, isShowingCachedData = false, cityName = cityName) }
             getCurrentWeather(lat, lon).collect { result ->
-                result.fold(
-                    onSuccess = { weather ->
-                        _uiState.update {
-                            it.copy(isLoading = false, weather = weather, outdoorScore = getOutdoorScore(weather))
-                        }
-                    },
-                    onFailure = { e ->
-                        _uiState.update { it.copy(isLoading = false, error = e.message) }
-                    },
-                )
+                when (result) {
+                    is WeatherResult.Fresh -> _uiState.update {
+                        it.copy(isLoading = false, weather = result.data, outdoorScore = getOutdoorScore(result.data), isOffline = false, isShowingCachedData = false)
+                    }
+                    is WeatherResult.Cached -> _uiState.update {
+                        it.copy(isLoading = false, weather = result.data, outdoorScore = getOutdoorScore(result.data), isOffline = true, isShowingCachedData = true)
+                    }
+                    is WeatherResult.Offline -> _uiState.update {
+                        it.copy(isLoading = false, isOffline = true, isShowingCachedData = false)
+                    }
+                    is WeatherResult.Error -> _uiState.update {
+                        it.copy(isLoading = false, error = result.message)
+                    }
+                }
             }
         }
     }

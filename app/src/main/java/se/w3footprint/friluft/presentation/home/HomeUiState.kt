@@ -9,5 +9,7 @@ data class HomeUiState(
     val outdoorScore: OutdoorScore? = null,
     val cityName: String = "",
     val error: String? = null,
+    val isOffline: Boolean = false,
+    val isShowingCachedData: Boolean = false,
     val locationPermissionRequired: Boolean = false,
 )

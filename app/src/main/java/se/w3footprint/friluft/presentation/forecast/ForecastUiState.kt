@@ -8,4 +8,5 @@ data class ForecastUiState(
     val daily: List<DailyForecast> = emptyList(),
     val hourly: List<HourlyForecast> = emptyList(),
     val error: String? = null,
+    val isOffline: Boolean = false,
 )
