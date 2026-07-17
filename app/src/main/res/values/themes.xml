@@ -1,3 +1,3 @@
 <resources>
-    <style name="Theme.FriLuft" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.FriLuft" parent="Theme.AppCompat.Light.NoActionBar" />
 </resources>
