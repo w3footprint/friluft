@@ -15,10 +15,19 @@ android {
         applicationId = "se.w3footprint.friluft"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = 3
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getProperty("user.home") + "/friluft-release.jks")
+            storePassword = System.getenv("FRILUFT_STORE_PASSWORD") ?: ""
+            keyAlias = "friluft"
+            keyPassword = System.getenv("FRILUFT_KEY_PASSWORD") ?: ""
+        }
     }
 
     buildTypes {
@@ -28,6 +37,7 @@ android {
             isDebuggable = true
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
